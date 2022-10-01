@@ -1,0 +1,6 @@
+apache2
+mysql
+.gitignore
+docker-compose.yml
+Dockerfile
+Makefile

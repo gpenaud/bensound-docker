@@ -26,8 +26,14 @@ services:
     ports:
       - 80:80
       - 443:443
+    healthcheck:
+      test: 'curl --header "X-No-Log-Healthcheck: yes" --head --insecure --location --fail http://localhost:80 || exit 1'
+      interval: 5s
+      timeout: 10s
+      retries: 3
     environment:
       DISPLAY_STARTUP_ERRORS: "ON"
+
 
   database:
     image: mysql:5.7.31

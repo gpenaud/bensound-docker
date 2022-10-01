@@ -38,5 +38,3 @@ RUN a2enmod \
   ssl \
   proxy \
   proxy_http
-
-HEALTHCHECK --interval=1m --timeout=30s --start-period=1s --retries=3 CMD curl --fail http://localhost:443 || exit 1
