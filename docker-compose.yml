@@ -1,0 +1,54 @@
+version: "3.7"
+
+networks:
+  bensound:
+
+services:
+  application:
+    image: bensound-application
+    build:
+      context: .
+    depends_on:
+      - database
+    volumes:
+      - ./src/:/var/www/html/
+      # apache2 global configuration
+      - ./apache2/apache2.conf:/etc/apache2/apache2.conf
+      # apache2 ssl certficate & key for domains
+      - ./apache2/certificates:/etc/apache2/certificates
+      # apache2 vhost for bensound application
+      - ./apache2/vhosts/bensound.conf:/etc/apache2/sites-available/bensound.localhost.conf
+      - ./apache2/vhosts/bensound.conf:/etc/apache2/sites-enabled/bensound.localhost.conf
+      # apache2 vhost for phpmyadmin
+      - ./apache2/vhosts/phpmyadmin.conf:/etc/apache2/sites-available/phpmyadmin.localhost.conf
+      - ./apache2/vhosts/phpmyadmin.conf:/etc/apache2/sites-enabled/phpmyadmin.localhost.conf
+      # - ~/projects/pennylane:/opt/app-root/pennylane
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      DISPLAY_STARTUP_ERRORS: "ON"
+
+  database:
+    image: mysql:5.7.31
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - 3306:3306
+    volumes:
+      # - ./mysql/data:/var/lib/mysql
+      - ./mysql/my.cnf:/etc/mysql/my.cnf
+    command: --default-authentication-plugin=mysql_native_password
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    depends_on:
+    - database
+    ports:
+      - 80
+      - 443
+    environment:
+      PMA_HOST: database
+      PMA_ABSOLUTE_URI: https://phpmyadmin.bensound.localhost
